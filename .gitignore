@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Ruby / Rails
+backend/.bundle/
+backend/vendor/bundle/
+backend/log/
+backend/tmp/
+backend/public/packs/
+backend/public/assets/
+backend/*.env
+backend/.env*
+backend/config/master.key
+backend/config/credentials/*.key
+
+# Node.js / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+frontend/.env*.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# その他
+*.log
