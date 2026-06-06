@@ -129,6 +129,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.19.8)
+    jwt (3.2.0)
+      base64
     kamal (2.11.0)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -356,6 +358,7 @@ DEPENDENCIES
   bundler-audit
   debug
   image_processing (~> 1.2)
+  jwt
   kamal
   mysql2 (~> 0.5)
   puma (>= 5.0)
