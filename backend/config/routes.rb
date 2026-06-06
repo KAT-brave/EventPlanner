@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       post "auth/guest_login", to: "auth#guest_login"
 
       resources :categories, only: [:index]
+      resources :events
     end
   end
 end
