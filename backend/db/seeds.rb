@@ -12,6 +12,11 @@ guest = User.find_or_create_by!(email: "guest@example.com") do |u|
   u.guest = true
 end
 
+User.find_or_create_by!(email: "test@example.com") do |u|
+  u.name = "テストユーザー"
+  u.password = "password123"
+end
+
 study   = Category.find_by!(name: "勉強会")
 nomikai = Category.find_by!(name: "飲み会")
 travel  = Category.find_by!(name: "旅行")
