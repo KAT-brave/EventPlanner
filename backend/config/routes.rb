@@ -8,6 +8,8 @@ Rails.application.routes.draw do
       post "auth/signup", to: "auth#signup"
       post "auth/login", to: "auth#login"
       post "auth/guest_login", to: "auth#guest_login"
+
+      resources :categories, only: [:index]
     end
   end
 end
