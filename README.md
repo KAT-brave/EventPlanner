@@ -301,4 +301,45 @@ npm run dev
 
 ## AWS構成
 
-（デプロイ後に追加）
+### 構成図
+
+```
+ユーザー
+  │
+  │ HTTP (ポート80)
+  ▼
+[EC2 (t3.micro)] ─── ap-southeast-2 (シドニー)
+  │
+  ├── nginx (リバースプロキシ)
+  │     ├── /api  → Rails (ポート3000)
+  │     └── /     → Next.js (ポート3001)
+  │
+  ├── Rails API サーバー (Puma / ポート3000)
+  │     └── RAILS_ENV=production
+  │
+  └── Next.js フロントエンド (ポート3001)
+
+  │
+  │ MySQL (ポート3306)
+  ▼
+[RDS (MySQL 8.x)] ─── ap-southeast-2 (シドニー)
+  └── eventplanner_production
+```
+
+### 構成の詳細
+
+| サービス | 内容 |
+|---------|------|
+| EC2 | t3.micro / Ubuntu 22.04 / ap-southeast-2 |
+| RDS | MySQL 8.x / t3.micro / ap-southeast-2 |
+| nginx | リバースプロキシとしてAPIとフロントを振り分け |
+| Rails | APIサーバー（Puma）/ productionモードで起動 |
+| Next.js | フロントエンドサーバー / productionビルド済み |
+
+### ネットワーク構成
+
+| 項目 | 設定 |
+|-----|------|
+| VPC | デフォルトVPC |
+| EC2 セキュリティグループ | HTTP(80) / SSH(22) / 3000 / 3001 を開放 |
+| RDS セキュリティグループ | EC2からのMySQL(3306)接続のみ許可 |
