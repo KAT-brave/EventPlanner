@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useFlash } from "@/context/FlashContext";
 import type { Event } from "@/types/event";
 
 export default function EventDetailPage() {
@@ -12,6 +13,7 @@ export default function EventDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const { user, token } = useAuth();
+  const { showFlash } = useFlash();
   const params = useParams();
   const router = useRouter();
   const id = params.id;
@@ -34,6 +36,7 @@ export default function EventDetailPage() {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) {
+      showFlash("イベントを削除しました");
       router.push("/events");
     }
   };

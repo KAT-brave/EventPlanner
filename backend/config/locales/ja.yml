@@ -1,0 +1,27 @@
+ja:
+  activerecord:
+    models:
+      event: イベント
+      user: ユーザー
+      category: カテゴリ
+    attributes:
+      event:
+        title: イベント名
+        event_date: 開催日
+        start_time: 開始時間
+        end_time: 終了時間
+        location: 場所
+        description: 説明
+        category: カテゴリ
+      user:
+        name: 名前
+        email: メールアドレス
+        password: パスワード
+        password_confirmation: パスワード（確認）
+  errors:
+    messages:
+      blank: を入力してください
+      taken: はすでに使用されています
+      too_long: は%{count}文字以内で入力してください
+      invalid: の形式が正しくありません
+      record_invalid: の入力内容を確認してください
