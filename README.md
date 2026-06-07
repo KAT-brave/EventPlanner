@@ -108,34 +108,9 @@ http://13.239.247.218
 
 ---
 
-## 技術スタック
+## 技術スタック・AWS構成
 
-### バックエンド
-
-| 役割 | 技術 | バージョン | 選定理由 |
-|------|------|----------|---------|
-| 言語 | Ruby | 3.3.2 | 記述量が少なく可読性が高い・Railsとの親和性 |
-| フレームワーク | Ruby on Rails | 8.1.3 | APIモードで軽量に使用可能・設定より規約で素早く開発できる |
-| 認証 | JWT（jwt gem） | 3.2.0 | ステートレスな認証・フロントとの分離に適している |
-| パスワード暗号化 | bcrypt | 3.1.x | Railsの `has_secure_password` と組み合わせて安全に暗号化 |
-| ORM | Active Record | Rails同梱 | SQLを意識せずモデルでDB操作が可能 |
-
-### フロントエンド
-
-| 役割 | 技術 | バージョン | 選定理由 |
-|------|------|----------|---------|
-| フレームワーク | Next.js | 16.x | App Router・SSR対応・ファイルベースルーティング |
-| 言語 | TypeScript | 5.x | 型安全・補完が効くことでバグを事前に防げる |
-| スタイリング | Tailwind CSS | 4.x | クラス名でUIを組め・デザインの一貫性を保ちやすい |
-| 状態管理 | React Context API | React同梱 | 外部ライブラリなしでログイン状態をアプリ全体で共有 |
-
-### インフラ
-
-| 役割 | 技術 |
-|------|------|
-| データベース | MySQL 9.6 |
-| Webサーバー | Puma（Rails同梱） |
-| デプロイ | AWS EC2 / RDS（予定） |
+詳細は [docs/architecture.md](docs/architecture.md) を参照してください。
 
 ---
 
@@ -159,75 +134,13 @@ http://13.239.247.218
 
 ## API一覧
 
-### 認証
-
-| メソッド | エンドポイント | 認証 | 説明 |
-|---------|--------------|------|------|
-| POST | `/api/v1/auth/signup` | 不要 | ユーザー登録 |
-| POST | `/api/v1/auth/login` | 不要 | ログイン（JWTトークンを返す） |
-| POST | `/api/v1/auth/guest_login` | 不要 | ゲストログイン |
-
-### イベント
-
-| メソッド | エンドポイント | 認証 | 説明 |
-|---------|--------------|------|------|
-| GET | `/api/v1/events` | 不要 | イベント一覧（検索・絞り込み・ソート対応） |
-| GET | `/api/v1/events/:id` | 不要 | イベント詳細 |
-| POST | `/api/v1/events` | 必要 | イベント作成 |
-| PUT | `/api/v1/events/:id` | 必要（作成者のみ） | イベント更新 |
-| DELETE | `/api/v1/events/:id` | 必要（作成者のみ） | イベント削除 |
-
-### カテゴリ
-
-| メソッド | エンドポイント | 認証 | 説明 |
-|---------|--------------|------|------|
-| GET | `/api/v1/categories` | 不要 | カテゴリ一覧 |
-
-### クエリパラメータ（イベント一覧）
-
-| パラメータ | 例 | 説明 |
-|---------|---|------|
-| `keyword` | `?keyword=勉強会` | タイトル・説明のキーワード検索 |
-| `category_id` | `?category_id=1` | カテゴリで絞り込み |
-| `sort` | `?sort=desc` | `asc`（昇順） / `desc`（降順） |
+詳細は [docs/api.md](docs/api.md) を参照してください。
 
 ---
 
 ## ER図
 
-```mermaid
-erDiagram
-    users {
-        bigint id PK
-        string name
-        string email
-        string password_digest
-        boolean guest
-        datetime created_at
-        datetime updated_at
-    }
-    categories {
-        bigint id PK
-        string name
-        datetime created_at
-        datetime updated_at
-    }
-    events {
-        bigint id PK
-        bigint user_id FK
-        bigint category_id FK
-        string title
-        text description
-        date event_date
-        time start_time
-        time end_time
-        string location
-        datetime created_at
-        datetime updated_at
-    }
-    users ||--o{ events : "has many"
-    categories ||--o{ events : "has many"
-```
+詳細は [docs/er_diagram.md](docs/er_diagram.md) を参照してください。
 
 ---
 
@@ -301,45 +214,4 @@ npm run dev
 
 ## AWS構成
 
-### 構成図
-
-```
-ユーザー
-  │
-  │ HTTP (ポート80)
-  ▼
-[EC2 (t3.micro)] ─── ap-southeast-2 (シドニー)
-  │
-  ├── nginx (リバースプロキシ)
-  │     ├── /api  → Rails (ポート3000)
-  │     └── /     → Next.js (ポート3001)
-  │
-  ├── Rails API サーバー (Puma / ポート3000)
-  │     └── RAILS_ENV=production
-  │
-  └── Next.js フロントエンド (ポート3001)
-
-  │
-  │ MySQL (ポート3306)
-  ▼
-[RDS (MySQL 8.x)] ─── ap-southeast-2 (シドニー)
-  └── eventplanner_production
-```
-
-### 構成の詳細
-
-| サービス | 内容 |
-|---------|------|
-| EC2 | t3.micro / Ubuntu 22.04 / ap-southeast-2 |
-| RDS | MySQL 8.x / t3.micro / ap-southeast-2 |
-| nginx | リバースプロキシとしてAPIとフロントを振り分け |
-| Rails | APIサーバー（Puma）/ productionモードで起動 |
-| Next.js | フロントエンドサーバー / productionビルド済み |
-
-### ネットワーク構成
-
-| 項目 | 設定 |
-|-----|------|
-| VPC | デフォルトVPC |
-| EC2 セキュリティグループ | HTTP(80) / SSH(22) / 3000 / 3001 を開放 |
-| RDS セキュリティグループ | EC2からのMySQL(3306)接続のみ許可 |
+詳細は [docs/architecture.md](docs/architecture.md) を参照してください。
